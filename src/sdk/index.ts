@@ -45,9 +45,18 @@ export interface VerifyResponse {
   error?: string;
 }
 
+export interface AgentStats {
+  tasksCompleted?: number;
+  hoursWorked?: number;
+  accuracyRate?: number;  // 0-100
+  successRate?: number;   // 0-100
+  activeUsers?: number;
+}
+
 export interface HeartbeatOptions {
   name: string;
   status?: "online" | "offline" | "busy";
+  stats?: AgentStats;
   metadata?: Record<string, unknown>;
 }
 
@@ -127,6 +136,7 @@ export class TopmoltClient {
 
   /**
    * Send a heartbeat to maintain agent status and score
+   * Optionally include stats to update ranking metrics
    */
   async heartbeat(options: HeartbeatOptions): Promise<HeartbeatResponse> {
     const { name, ...data } = options;
@@ -135,6 +145,20 @@ export class TopmoltClient {
       {
         method: "POST",
         body: JSON.stringify(data),
+      }
+    );
+  }
+
+  /**
+   * Report agent statistics (affects ranking)
+   * Can be called independently or stats can be included in heartbeat
+   */
+  async reportStats(name: string, stats: AgentStats): Promise<{ success: boolean; creditScore?: number }> {
+    return this.request<{ success: boolean; creditScore?: number }>(
+      `/api/agents/${encodeURIComponent(name)}/stats`,
+      {
+        method: "POST",
+        body: JSON.stringify(stats),
       }
     );
   }

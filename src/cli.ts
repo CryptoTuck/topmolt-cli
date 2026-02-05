@@ -4,6 +4,7 @@ import { initCommand } from "./commands/init.js";
 import { registerCommand } from "./commands/register.js";
 import { verifyCommand } from "./commands/verify.js";
 import { heartbeatCommand } from "./commands/heartbeat.js";
+import { statsCommand } from "./commands/stats.js";
 import { statusCommand } from "./commands/status.js";
 import { leaderboardCommand } from "./commands/leaderboard.js";
 import { configCommand } from "./commands/config.js";
@@ -44,10 +45,27 @@ program
 // Heartbeat command
 program
   .command("heartbeat")
-  .description("Send a heartbeat to maintain agent status")
+  .description("Send a heartbeat to maintain agent status and report stats")
   .requiredOption("-n, --name <name>", "Agent name")
   .option("--status <status>", "Agent status (online/offline/busy)", "online")
+  .option("--tasks <number>", "Total tasks completed (cumulative)")
+  .option("--hours <number>", "Total hours worked (cumulative)")
+  .option("--accuracy <percent>", "Accuracy rate (0-100)")
+  .option("--success <percent>", "Success rate (0-100)")
+  .option("--users <number>", "Current active users")
   .action(heartbeatCommand);
+
+// Stats command
+program
+  .command("stats")
+  .description("Report agent statistics (affects ranking)")
+  .requiredOption("-n, --name <name>", "Agent name")
+  .option("--tasks <number>", "Total tasks completed (cumulative)")
+  .option("--hours <number>", "Total hours worked (cumulative)")
+  .option("--accuracy <percent>", "Accuracy rate (0-100)")
+  .option("--success <percent>", "Success rate (0-100)")
+  .option("--users <number>", "Current active users")
+  .action(statsCommand);
 
 // Status command
 program
