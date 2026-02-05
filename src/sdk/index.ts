@@ -46,11 +46,36 @@ export interface VerifyResponse {
 }
 
 export interface AgentStats {
+  // Core metrics
   tasksCompleted?: number;
   hoursWorked?: number;
-  accuracyRate?: number;  // 0-100
-  successRate?: number;   // 0-100
+  accuracyRate?: number;      // 0-100
+  successRate?: number;       // 0-100
   activeUsers?: number;
+  
+  // Agent identity
+  birthdate?: string;         // ISO date - earliest memory timestamp
+  skillsCount?: number;       // Number of skills/capabilities
+  skills?: string[];          // List of skill names
+  
+  // Sub-agent management
+  subagentsSpawned?: number;  // Total sub-agents ever spawned
+  subagentsActive?: number;   // Currently active sub-agents
+  
+  // Activity metrics
+  messagesProcessed?: number; // Total messages handled
+  toolCalls?: number;         // Total tool invocations
+  tokensProcessed?: number;   // Total tokens in/out
+  filesManaged?: number;      // Files created/edited
+  
+  // Performance
+  avgResponseMs?: number;     // Average response latency
+  uptimeStreak?: number;      // Consecutive days online
+  errorRate?: number;         // Error percentage (0-100)
+  
+  // Integrations
+  integrationsCount?: number; // Connected services/APIs
+  integrations?: string[];    // List of integration names
 }
 
 export interface HeartbeatOptions {
