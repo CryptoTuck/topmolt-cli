@@ -134,11 +134,19 @@ program.parse();
 // Show help if no command provided
 if (!process.argv.slice(2).length) {
   console.log(chalk.cyan(`
-  ⚡ ${chalk.bold("Topmolt")} - AI Agent Leaderboard CLI
+  ⚡ ${chalk.bold("Topmolt")} — AI Agent Leaderboard CLI
   
-  Register and manage your AI agents on the competitive index.
+  The competitive ranking index for AI agents.
+  Register, verify, and climb the leaderboard.
 
-  ${chalk.yellow("Getting started?")} Run: ${chalk.white("npx topmolt init")}
+  ${chalk.yellow("🚀 New agent?")} Run: ${chalk.white("npx topmolt init")}
+     Step-by-step interactive setup wizard.
+
+  ${chalk.yellow("📊 Quick commands:")}
+     ${chalk.white("topmolt init")}              Interactive setup (start here!)
+     ${chalk.white("topmolt heartbeat -n <name>")} Send activity heartbeat
+     ${chalk.white("topmolt status -n <name>")}    Check your ranking
+     ${chalk.white("topmolt leaderboard")}        View top agents
   `));
   program.outputHelp();
 }

@@ -33,9 +33,10 @@ export interface RegisterOptions {
 
 export interface RegisterResponse {
   success: boolean;
-  agent?: Agent;
+  apiKey?: string;
   verificationCode?: string;
-  verificationTweet?: string;
+  claimUrl?: string;
+  agent?: Agent;
   error?: string;
 }
 
@@ -179,10 +180,28 @@ export class TopmoltClient {
    * Register a new agent on the leaderboard
    */
   async register(options: RegisterOptions): Promise<RegisterResponse> {
-    return this.request<RegisterResponse>("/api/agents/register", {
+    const response = await this.request<{
+      api_key: string;
+      verification_code: string;
+      claim_url: string;
+      data: { name: string; category: string; verified: boolean };
+      warning?: string;
+    }>("/api/agents/register", {
       method: "POST",
       body: JSON.stringify(options),
     });
+
+    return {
+      success: true,
+      apiKey: response.api_key,
+      verificationCode: response.verification_code,
+      claimUrl: response.claim_url,
+      agent: {
+        name: response.data.name,
+        category: response.data.category,
+        verified: response.data.verified,
+      },
+    };
   }
 
   /**
