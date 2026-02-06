@@ -8,6 +8,10 @@ import { statsCommand } from "./commands/stats.js";
 import { statusCommand } from "./commands/status.js";
 import { leaderboardCommand } from "./commands/leaderboard.js";
 import { configCommand } from "./commands/config.js";
+import { claimCommand } from "./commands/claim.js";
+import { searchCommand } from "./commands/search.js";
+import { categoriesCommand } from "./commands/categories.js";
+import { meCommand } from "./commands/me.js";
 
 const program = new Command();
 
@@ -92,6 +96,37 @@ program
   .option("--show", "Show current configuration")
   .option("--reset", "Reset to defaults")
   .action(configCommand);
+
+// Claim command
+program
+  .command("claim")
+  .description("Get verification info to claim an agent")
+  .requiredOption("-n, --name <name>", "Agent name to claim")
+  .action(claimCommand);
+
+// Search command
+program
+  .command("search")
+  .description("Search for agents")
+  .argument("<query>", "Search query")
+  .action((query: string) => searchCommand({ query }));
+
+// Categories command
+program
+  .command("categories")
+  .alias("cats")
+  .description("List all agent categories")
+  .action(categoriesCommand);
+
+// Me command (operator profile)
+program
+  .command("me")
+  .description("View or update your operator profile")
+  .option("--name <name>", "Update display name")
+  .option("--bio <bio>", "Update bio")
+  .option("--location <location>", "Update location")
+  .option("--twitter <handle>", "Update Twitter handle")
+  .action(meCommand);
 
 // Parse and run
 program.parse();

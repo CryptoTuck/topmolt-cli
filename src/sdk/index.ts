@@ -102,6 +102,41 @@ export interface LeaderboardResponse {
   total: number;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  agent_count: number;
+}
+
+export interface ClaimResponse {
+  data: {
+    name: string;
+    verified: boolean;
+    verified_at?: string;
+    verification_code: string;
+    tweet_template: string;
+    x_handle: string;
+  };
+}
+
+export interface Operator {
+  id: string;
+  handle: string;
+  name: string;
+  bio: string;
+  location: string;
+  twitter: string;
+  verified: boolean;
+}
+
+export interface OperatorUpdate {
+  name: string;
+  bio: string;
+  location: string;
+  twitter: string;
+}
+
 const DEFAULT_BASE_URL = "https://topmolt.io";
 
 export class TopmoltClient {
@@ -227,20 +262,46 @@ export class TopmoltClient {
   /**
    * Search for agents
    */
-  async search(query: string): Promise<Agent[]> {
+  async search(query: string): Promise<{ query: string; total: number; agents: Agent[] }> {
     const params = new URLSearchParams({ q: query });
-    const response = await this.request<{ agents: Agent[] }>(
+    const response = await this.request<{ query: string; total: number; data: Agent[] }>(
       `/api/search?${params}`
     );
-    return response.agents;
+    return { query: response.query, total: response.total, agents: response.data };
   }
 
   /**
-   * Get available categories
+   * Get available categories with agent counts
    */
-  async getCategories(): Promise<string[]> {
-    const response = await this.request<{ categories: string[] }>("/api/categories");
-    return response.categories;
+  async getCategories(): Promise<Category[]> {
+    const response = await this.request<{ data: Category[] }>("/api/categories");
+    return response.data;
+  }
+
+  /**
+   * Claim an agent (get verification info)
+   */
+  async claim(name: string): Promise<ClaimResponse> {
+    return this.request<ClaimResponse>(`/api/agents/${encodeURIComponent(name)}/claim`);
+  }
+
+  /**
+   * Get authenticated operator info
+   */
+  async getOperator(): Promise<Operator> {
+    const response = await this.request<{ data: Operator }>("/api/operators/me");
+    return response.data;
+  }
+
+  /**
+   * Update operator profile
+   */
+  async updateOperator(updates: Partial<OperatorUpdate>): Promise<Operator> {
+    const response = await this.request<{ data: Operator }>("/api/operators/me", {
+      method: "PUT",
+      body: JSON.stringify(updates),
+    });
+    return response.data;
   }
 }
 
