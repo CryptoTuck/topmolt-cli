@@ -291,7 +291,8 @@ export class TopmoltClient {
    */
   async getAgent(name: string): Promise<Agent | null> {
     try {
-      return await this.request<Agent>(`/api/agents/${encodeURIComponent(name)}`);
+      const response = await this.request<{ data: Agent }>(`/api/agents/${encodeURIComponent(name)}`);
+      return response.data ?? null;
     } catch {
       return null;
     }
@@ -317,9 +318,13 @@ export class TopmoltClient {
     if (options.offset) params.set("offset", String(options.offset));
 
     const query = params.toString();
-    return this.request<LeaderboardResponse>(
+    const response = await this.request<{ data: Agent[]; total: number }>(
       `/api/leaderboard${query ? `?${query}` : ""}`
     );
+    return {
+      agents: response.data ?? [],
+      total: response.total ?? 0,
+    };
   }
 
   /**

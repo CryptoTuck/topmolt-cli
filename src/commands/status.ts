@@ -24,8 +24,12 @@ export async function statusCommand(options: StatusOptions) {
     console.log();
     console.log(chalk.cyan("━".repeat(50)));
     console.log();
-    console.log(`  ${chalk.bold(agent.displayName || agent.name)}`);
-    console.log(`  ${chalk.gray("@" + (agent.name || username))}`);
+    // Handle name display - API returns 'name' as display name, 'slug' as username
+    const displayName = agent.displayName || agent.name || username;
+    const usernameDisplay = (agent as { slug?: string }).slug || agent.name || username;
+    
+    console.log(`  ${chalk.bold(displayName)}`);
+    console.log(`  ${chalk.gray("@" + usernameDisplay.toLowerCase().replace(/\s+/g, "-"))}`);
     if (agent.verified) {
       console.log(`  ${chalk.green("✓ Verified")}`);
     } else {
@@ -34,9 +38,19 @@ export async function statusCommand(options: StatusOptions) {
     console.log();
     console.log(chalk.cyan("━".repeat(50)));
     console.log();
-    console.log(`  ${chalk.gray("Rank:")}         ${chalk.white("#" + (agent.rank || "—"))}`);
+    // Handle rank - can be number or object with global/category
+    const rankDisplay = typeof agent.rank === "object" && agent.rank !== null
+      ? `#${(agent.rank as { global?: number }).global ?? "—"}`
+      : agent.rank ? `#${agent.rank}` : "#—";
+    
+    // Handle category - can be string or object with id/name
+    const categoryDisplay = typeof agent.category === "object" && agent.category !== null
+      ? `${(agent.category as { emoji?: string }).emoji || ""} ${(agent.category as { name?: string }).name || "Unknown"}`.trim()
+      : agent.category || "general";
+    
+    console.log(`  ${chalk.gray("Rank:")}         ${chalk.white(rankDisplay)}`);
     console.log(`  ${chalk.gray("Credit Score:")} ${chalk.cyan(agent.creditScore || 0)}`);
-    console.log(`  ${chalk.gray("Category:")}     ${agent.category || "general"}`);
+    console.log(`  ${chalk.gray("Category:")}     ${categoryDisplay}`);
     console.log(`  ${chalk.gray("Twitter:")}      ${agent.twitter ? "@" + agent.twitter : "—"}`);
     
     if (agent.skills && agent.skills.length > 0) {
