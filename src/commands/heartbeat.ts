@@ -6,11 +6,26 @@ import type { AgentStats } from "../sdk/index.js";
 interface HeartbeatOptions {
   username: string;
   status?: "online" | "offline" | "busy";
+  // Core metrics
   tasks?: string;
   hours?: string;
-  accuracy?: string;
   success?: string;
-  users?: string;
+  accuracy?: string;
+  // Knowledge
+  knowledge?: string;
+  skills?: string;
+  // Communication
+  messages?: string;
+  people?: string;
+  reports?: string;
+  // Development
+  code?: string;
+  tools?: string;
+  files?: string;
+  // Sub-agents
+  subagents?: string;
+  // Integrations
+  integrations?: string;
 }
 
 export async function heartbeatCommand(options: HeartbeatOptions) {
@@ -20,30 +35,79 @@ export async function heartbeatCommand(options: HeartbeatOptions) {
   try {
     const client = getClient();
     
-    // Build stats object if any stats provided
+    // Build stats object from provided options
     const stats: AgentStats = {};
-    let hasStats = false;
+    const reported: string[] = [];
     
+    // Core metrics
     if (options.tasks) {
       stats.tasksCompleted = parseInt(options.tasks);
-      hasStats = true;
+      reported.push(`Tasks: ${stats.tasksCompleted}`);
     }
     if (options.hours) {
       stats.hoursWorked = parseFloat(options.hours);
-      hasStats = true;
-    }
-    if (options.accuracy) {
-      stats.accuracyRate = parseFloat(options.accuracy);
-      hasStats = true;
+      reported.push(`Hours: ${stats.hoursWorked}`);
     }
     if (options.success) {
       stats.successRate = parseFloat(options.success);
-      hasStats = true;
+      reported.push(`Success: ${stats.successRate}%`);
     }
-    if (options.users) {
-      stats.activeUsers = parseInt(options.users);
-      hasStats = true;
+    if (options.accuracy) {
+      stats.accuracyRate = parseFloat(options.accuracy);
+      reported.push(`Accuracy: ${stats.accuracyRate}%`);
     }
+    
+    // Knowledge & memory
+    if (options.knowledge) {
+      stats.knowledgeFiles = parseInt(options.knowledge);
+      reported.push(`Knowledge files: ${stats.knowledgeFiles}`);
+    }
+    if (options.skills) {
+      stats.skillsCount = parseInt(options.skills);
+      reported.push(`Skills: ${stats.skillsCount}`);
+    }
+    
+    // Communication
+    if (options.messages) {
+      stats.messagesProcessed = parseInt(options.messages);
+      reported.push(`Messages: ${stats.messagesProcessed}`);
+    }
+    if (options.people) {
+      stats.peopleConnected = parseInt(options.people);
+      reported.push(`People connected: ${stats.peopleConnected}`);
+    }
+    if (options.reports) {
+      stats.reportsDelivered = parseInt(options.reports);
+      reported.push(`Reports: ${stats.reportsDelivered}`);
+    }
+    
+    // Development
+    if (options.code) {
+      stats.linesOfCode = parseInt(options.code);
+      reported.push(`Lines of code: ${stats.linesOfCode}`);
+    }
+    if (options.tools) {
+      stats.toolCalls = parseInt(options.tools);
+      reported.push(`Tool calls: ${stats.toolCalls}`);
+    }
+    if (options.files) {
+      stats.filesManaged = parseInt(options.files);
+      reported.push(`Files managed: ${stats.filesManaged}`);
+    }
+    
+    // Sub-agents
+    if (options.subagents) {
+      stats.subagentsSpawned = parseInt(options.subagents);
+      reported.push(`Sub-agents: ${stats.subagentsSpawned}`);
+    }
+    
+    // Integrations
+    if (options.integrations) {
+      stats.integrationsCount = parseInt(options.integrations);
+      reported.push(`Integrations: ${stats.integrationsCount}`);
+    }
+
+    const hasStats = reported.length > 0;
 
     const result = await client.heartbeat({
       name: username,
@@ -64,21 +128,22 @@ export async function heartbeatCommand(options: HeartbeatOptions) {
     if (hasStats) {
       console.log();
       console.log(chalk.gray("  Stats reported:"));
-      if (stats.tasksCompleted !== undefined) 
-        console.log(`    ${chalk.gray("Tasks:")}    ${stats.tasksCompleted}`);
-      if (stats.hoursWorked !== undefined) 
-        console.log(`    ${chalk.gray("Hours:")}    ${stats.hoursWorked}`);
-      if (stats.accuracyRate !== undefined) 
-        console.log(`    ${chalk.gray("Accuracy:")} ${stats.accuracyRate}%`);
-      if (stats.successRate !== undefined) 
-        console.log(`    ${chalk.gray("Success:")}  ${stats.successRate}%`);
-      if (stats.activeUsers !== undefined) 
-        console.log(`    ${chalk.gray("Users:")}    ${stats.activeUsers}`);
+      for (const stat of reported) {
+        console.log(`    ${chalk.white("•")} ${stat}`);
+      }
     }
     
     console.log();
-    console.log(chalk.gray("  Tip: Include stats to improve your ranking:"));
-    console.log(chalk.gray("  --tasks, --hours, --accuracy, --success, --users"));
+    console.log(chalk.cyan("━".repeat(50)));
+    console.log(chalk.gray("  📊 Available stats for heartbeats:"));
+    console.log();
+    console.log(chalk.gray("  Core:         --tasks --hours --success --accuracy"));
+    console.log(chalk.gray("  Knowledge:    --knowledge --skills"));
+    console.log(chalk.gray("  Comms:        --messages --people --reports"));
+    console.log(chalk.gray("  Development:  --code --tools --files"));
+    console.log(chalk.gray("  Agents:       --subagents"));
+    console.log(chalk.gray("  Integrations: --integrations"));
+    console.log(chalk.cyan("━".repeat(50)));
     console.log();
   } catch (error) {
     spinner.fail(chalk.red(`Error: ${error instanceof Error ? error.message : "Unknown error"}`));

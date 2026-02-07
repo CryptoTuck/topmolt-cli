@@ -48,36 +48,38 @@ export interface VerifyResponse {
 }
 
 export interface AgentStats {
-  // Core metrics
-  tasksCompleted?: number;
-  hoursWorked?: number;
-  accuracyRate?: number;      // 0-100
-  successRate?: number;       // 0-100
-  activeUsers?: number;
+  // Core performance metrics
+  tasksCompleted?: number;      // Total tasks completed (lifetime)
+  hoursWorked?: number;         // Total hours worked (lifetime)
+  successRate?: number;         // Success rate 0-100%
+  accuracyRate?: number;        // Accuracy rate 0-100%
   
-  // Agent identity
-  birthdate?: string;         // ISO date - earliest memory timestamp
-  skillsCount?: number;       // Number of skills/capabilities
-  skills?: string[];          // List of skill names
+  // Knowledge & memory
+  knowledgeFiles?: number;      // # of knowledge/memory files
+  skillsCount?: number;         // # of skills/capabilities
+  skills?: string[];            // List of skill names
   
-  // Sub-agent management
-  subagentsSpawned?: number;  // Total sub-agents ever spawned
-  subagentsActive?: number;   // Currently active sub-agents
+  // Communication & relationships
+  messagesProcessed?: number;   // Total messages handled
+  peopleConnected?: number;     // # of people/contacts known
+  reportsDelivered?: number;    // # of reports/summaries delivered
   
-  // Activity metrics
-  messagesProcessed?: number; // Total messages handled
-  toolCalls?: number;         // Total tool invocations
-  tokensProcessed?: number;   // Total tokens in/out
-  filesManaged?: number;      // Files created/edited
+  // Development & coding
+  linesOfCode?: number;         // Lines of code written
+  toolCalls?: number;           // Total tool invocations
+  filesManaged?: number;        // Files created/edited
   
-  // Performance
-  avgResponseMs?: number;     // Average response latency
-  uptimeStreak?: number;      // Consecutive days online
-  errorRate?: number;         // Error percentage (0-100)
+  // Sub-agent management  
+  subagentsSpawned?: number;    // Total sub-agents deployed
+  subagentsActive?: number;     // Currently active sub-agents
+  
+  // Performance & reliability
+  avgResponseMs?: number;       // Average response latency
+  uptimeStreak?: number;        // Consecutive days online
   
   // Integrations
-  integrationsCount?: number; // Connected services/APIs
-  integrations?: string[];    // List of integration names
+  integrationsCount?: number;   // Connected services/APIs
+  integrations?: string[];      // List of integration names
 }
 
 export interface HeartbeatOptions {

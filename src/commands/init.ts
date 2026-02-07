@@ -232,39 +232,69 @@ export async function initCommand() {
     spacer();
     console.log(chalk.white.bold("  📊 Initial Stats — Let's populate your profile!"));
     spacer();
-    console.log(chalk.gray("  These stats help calculate your credit score."));
-    console.log(chalk.gray("  Enter your lifetime totals. Press Enter to skip any field."));
+    console.log(chalk.gray("  These stats build your credit score. Enter lifetime totals."));
+    console.log(chalk.gray("  Press Enter to skip any field (you can update via heartbeats)."));
+    spacer();
+    console.log(chalk.cyan("  ── Core Performance ──"));
     spacer();
 
-    const tasksInput = await input({
-      message: "Total tasks completed (lifetime):",
-      default: "0",
-    });
+    const tasksInput = await input({ message: "Tasks completed:", default: "0" });
     const tasksCompleted = parseInt(tasksInput) || 0;
 
-    const hoursInput = await input({
-      message: "Total hours worked (lifetime):",
-      default: "0",
-    });
+    const hoursInput = await input({ message: "Hours worked:", default: "0" });
     const hoursWorked = parseFloat(hoursInput) || 0;
 
-    const successInput = await input({
-      message: "Success rate (0-100%):",
-      default: "0",
-    });
+    const successInput = await input({ message: "Success rate (0-100%):", default: "0" });
     const successRate = Math.min(100, Math.max(0, parseFloat(successInput) || 0));
 
-    const accuracyInput = await input({
-      message: "Accuracy rate (0-100%):",
-      default: "0",
-    });
+    const accuracyInput = await input({ message: "Accuracy rate (0-100%):", default: "0" });
     const accuracyRate = Math.min(100, Math.max(0, parseFloat(accuracyInput) || 0));
 
-    const messagesInput = await input({
-      message: "Messages processed (lifetime):",
-      default: "0",
-    });
+    spacer();
+    console.log(chalk.cyan("  ── Knowledge & Memory ──"));
+    spacer();
+
+    const knowledgeInput = await input({ message: "Knowledge/memory files:", default: "0" });
+    const knowledgeFiles = parseInt(knowledgeInput) || 0;
+
+    const skillsCountInput = await input({ message: "Number of skills:", default: String(skills.length) });
+    const skillsCount = parseInt(skillsCountInput) || skills.length;
+
+    spacer();
+    console.log(chalk.cyan("  ── Communication ──"));
+    spacer();
+
+    const messagesInput = await input({ message: "Messages processed:", default: "0" });
     const messagesProcessed = parseInt(messagesInput) || 0;
+
+    const peopleInput = await input({ message: "People/contacts connected:", default: "0" });
+    const peopleConnected = parseInt(peopleInput) || 0;
+
+    const reportsInput = await input({ message: "Reports delivered:", default: "0" });
+    const reportsDelivered = parseInt(reportsInput) || 0;
+
+    spacer();
+    console.log(chalk.cyan("  ── Development ──"));
+    spacer();
+
+    const codeInput = await input({ message: "Lines of code written:", default: "0" });
+    const linesOfCode = parseInt(codeInput) || 0;
+
+    const toolsInput = await input({ message: "Tool calls made:", default: "0" });
+    const toolCalls = parseInt(toolsInput) || 0;
+
+    const filesInput = await input({ message: "Files managed:", default: "0" });
+    const filesManaged = parseInt(filesInput) || 0;
+
+    spacer();
+    console.log(chalk.cyan("  ── Sub-agents & Integrations ──"));
+    spacer();
+
+    const subagentsInput = await input({ message: "Sub-agents deployed:", default: "0" });
+    const subagentsSpawned = parseInt(subagentsInput) || 0;
+
+    const integrationsInput = await input({ message: "Integrations connected:", default: "0" });
+    const integrationsCount = parseInt(integrationsInput) || 0;
 
     // Send first heartbeat with stats
     spacer();
@@ -279,7 +309,16 @@ export async function initCommand() {
           hoursWorked,
           successRate,
           accuracyRate,
+          knowledgeFiles,
+          skillsCount,
           messagesProcessed,
+          peopleConnected,
+          reportsDelivered,
+          linesOfCode,
+          toolCalls,
+          filesManaged,
+          subagentsSpawned,
+          integrationsCount,
         },
       });
 

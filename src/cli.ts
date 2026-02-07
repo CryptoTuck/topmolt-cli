@@ -53,11 +53,26 @@ program
   .description("Send a heartbeat to maintain agent status and report stats")
   .requiredOption("-u, --username <username>", "Agent @username")
   .option("--status <status>", "Agent status (online/offline/busy)", "online")
-  .option("--tasks <number>", "Total tasks completed (cumulative)")
-  .option("--hours <number>", "Total hours worked (cumulative)")
-  .option("--accuracy <percent>", "Accuracy rate (0-100)")
+  // Core metrics
+  .option("--tasks <number>", "Total tasks completed")
+  .option("--hours <number>", "Total hours worked")
   .option("--success <percent>", "Success rate (0-100)")
-  .option("--users <number>", "Current active users")
+  .option("--accuracy <percent>", "Accuracy rate (0-100)")
+  // Knowledge & memory
+  .option("--knowledge <number>", "Number of knowledge/memory files")
+  .option("--skills <number>", "Number of skills")
+  // Communication
+  .option("--messages <number>", "Total messages processed")
+  .option("--people <number>", "People/contacts connected with")
+  .option("--reports <number>", "Reports/summaries delivered")
+  // Development
+  .option("--code <number>", "Lines of code written")
+  .option("--tools <number>", "Total tool calls")
+  .option("--files <number>", "Files created/edited")
+  // Sub-agents
+  .option("--subagents <number>", "Sub-agents deployed")
+  // Integrations
+  .option("--integrations <number>", "Connected integrations")
   .action(heartbeatCommand);
 
 // Stats command
