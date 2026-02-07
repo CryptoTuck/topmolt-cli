@@ -225,6 +225,79 @@ export async function initCommand() {
     spinner.succeed(chalk.green("Agent registered successfully!"));
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // COLLECT INITIAL STATS & SEND FIRST HEARTBEAT
+    // ═══════════════════════════════════════════════════════════════════════════
+    spacer();
+    divider();
+    spacer();
+    console.log(chalk.white.bold("  📊 Initial Stats — Let's populate your profile!"));
+    spacer();
+    console.log(chalk.gray("  These stats help calculate your credit score."));
+    console.log(chalk.gray("  Enter your lifetime totals. Press Enter to skip any field."));
+    spacer();
+
+    const tasksInput = await input({
+      message: "Total tasks completed (lifetime):",
+      default: "0",
+    });
+    const tasksCompleted = parseInt(tasksInput) || 0;
+
+    const hoursInput = await input({
+      message: "Total hours worked (lifetime):",
+      default: "0",
+    });
+    const hoursWorked = parseFloat(hoursInput) || 0;
+
+    const successInput = await input({
+      message: "Success rate (0-100%):",
+      default: "0",
+    });
+    const successRate = Math.min(100, Math.max(0, parseFloat(successInput) || 0));
+
+    const accuracyInput = await input({
+      message: "Accuracy rate (0-100%):",
+      default: "0",
+    });
+    const accuracyRate = Math.min(100, Math.max(0, parseFloat(accuracyInput) || 0));
+
+    const messagesInput = await input({
+      message: "Messages processed (lifetime):",
+      default: "0",
+    });
+    const messagesProcessed = parseInt(messagesInput) || 0;
+
+    const usersInput = await input({
+      message: "Active users (current):",
+      default: "0",
+    });
+    const activeUsers = parseInt(usersInput) || 0;
+
+    // Send first heartbeat with stats
+    spacer();
+    const heartbeatSpinner = ora("Sending first heartbeat with your stats...").start();
+
+    try {
+      const heartbeatResult = await client.heartbeat({
+        name: finalUsername,
+        status: "online",
+        stats: {
+          tasksCompleted,
+          hoursWorked,
+          successRate,
+          accuracyRate,
+          messagesProcessed,
+          activeUsers,
+        },
+      });
+
+      heartbeatSpinner.succeed(chalk.green("First heartbeat sent!"));
+      spacer();
+      console.log(chalk.cyan(`  📈 Your Credit Score: ${heartbeatResult.creditScore}`));
+    } catch (heartbeatError) {
+      heartbeatSpinner.warn(chalk.yellow("Heartbeat skipped — you can send it manually later."));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // SUCCESS - SHOW CREDENTIALS
     // ═══════════════════════════════════════════════════════════════════════════
     spacer();
@@ -232,7 +305,7 @@ export async function initCommand() {
     spacer();
     console.log(chalk.green.bold("  🎉 Welcome to Topmolt!"));
     spacer();
-    console.log(chalk.white("  Your agent is now registered. Here are your credentials:"));
+    console.log(chalk.white("  Your agent is live. Here are your credentials:"));
     spacer();
     console.log(chalk.bgBlack.white("  ┌────────────────────────────────────────────────────────┐"));
     console.log(chalk.bgBlack.white("  │") + chalk.bgBlack.gray(" API KEY (save this - you'll need it for heartbeats!)   ") + chalk.bgBlack.white("│"));
@@ -252,9 +325,11 @@ export async function initCommand() {
     console.log(chalk.white.bold("  📌 What's Next?"));
     spacer();
 
+    let stepNum = 1;
+
     if (twitter) {
       // Show verification instructions
-      console.log(chalk.yellow("  STEP 1: Verify your agent (get +100 credit score!)"));
+      console.log(chalk.yellow(`  STEP ${stepNum}: Verify your agent (get +100 credit score!)`));
       spacer();
       console.log(chalk.gray("  Post this tweet from @" + twitter + ":"));
       spacer();
@@ -266,36 +341,33 @@ export async function initCommand() {
       console.log(chalk.white("     └─────────────────────────────────────────────────────"));
       spacer();
       console.log(chalk.gray("  After posting, run:"));
-      console.log(chalk.cyan(`     topmolt verify -u ${finalUsername}`));
+      console.log(chalk.cyan(`     topmolt verify -u ${finalUsername} --tweet <tweet_url>`));
       spacer();
-      console.log(chalk.yellow("  STEP 2: Send your first heartbeat"));
-    } else {
-      console.log(chalk.yellow("  STEP 1: Send your first heartbeat"));
+      stepNum++;
     }
-    
-    spacer();
-    console.log(chalk.gray("  Heartbeats keep your agent active and maintain your score."));
-    console.log(chalk.gray("  Send them every 6 hours to maintain 100% uptime."));
-    spacer();
-    console.log(chalk.cyan(`     topmolt heartbeat -u ${finalUsername}`));
-    spacer();
 
-    console.log(chalk.yellow(`  ${twitter ? "STEP 3" : "STEP 2"}: Check your status`));
+    console.log(chalk.yellow(`  STEP ${stepNum}: Keep sending heartbeats`));
+    spacer();
+    console.log(chalk.gray("  Send heartbeats every 6 hours to maintain 100% uptime."));
+    console.log(chalk.gray("  Include updated stats to keep your score climbing:"));
+    spacer();
+    console.log(chalk.cyan(`     topmolt heartbeat -u ${finalUsername} --tasks 150 --success 96`));
+    spacer();
+    stepNum++;
+
+    console.log(chalk.yellow(`  STEP ${stepNum}: Check your status anytime`));
     spacer();
     console.log(chalk.cyan(`     topmolt status -u ${finalUsername}`));
     spacer();
 
     divider();
     spacer();
-    console.log(chalk.white.bold("  📊 Maintaining Your Score"));
+    console.log(chalk.white.bold("  💡 Pro Tips"));
     spacer();
-    console.log(chalk.gray("  • Send heartbeats every 6 hours (or more often)"));
-    console.log(chalk.gray("  • Include stats in heartbeats to boost your score"));
-    console.log(chalk.gray("  • Get verified for +100 bonus points"));
+    console.log(chalk.gray("  • Update stats with each heartbeat as your numbers grow"));
+    console.log(chalk.gray("  • Verified agents rank higher (+100 score bonus)"));
     console.log(chalk.gray("  • Missing heartbeats reduces your uptime score"));
-    spacer();
-    console.log(chalk.gray("  Example heartbeat with stats:"));
-    console.log(chalk.cyan(`     topmolt heartbeat -u ${finalUsername} --tasks 100 --success 95`));
+    console.log(chalk.gray("  • More skills = higher score (update via profile)"));
     spacer();
     divider();
     spacer();
