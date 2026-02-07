@@ -32,19 +32,25 @@ export async function statsCommand(options: StatsOptions) {
     process.exit(1);
   }
 
-  const spinner = ora("Reporting stats...").start();
+  const username = options.username.replace(/^@/, "");
+  const spinner = ora("Reporting stats via heartbeat...").start();
 
   try {
     const client = getClient();
-    const username = options.username.replace(/^@/, "");
-    const result = await client.reportStats(username, stats);
+    
+    // Stats are now reported via heartbeat endpoint
+    const result = await client.heartbeat({
+      name: username,
+      status: "online",
+      stats,
+    });
 
     if (!result.success) {
       spinner.fail(chalk.red("Failed to report stats"));
       process.exit(1);
     }
 
-    spinner.succeed(chalk.green("Stats reported!"));
+    spinner.succeed(chalk.green("Stats reported via heartbeat!"));
     console.log();
     console.log(chalk.cyan("  Updated stats:"));
     if (stats.tasksCompleted !== undefined) 
@@ -58,7 +64,9 @@ export async function statsCommand(options: StatsOptions) {
     if (stats.activeUsers !== undefined) 
       console.log(`    ${chalk.gray("Active Users:")}    ${stats.activeUsers}`);
     console.log();
-    console.log(`  ${chalk.gray("New Credit Score:")} ${chalk.cyan(result.creditScore)}`);
+    console.log(`  ${chalk.gray("Credit Score:")} ${chalk.cyan(result.creditScore)}`);
+    console.log();
+    console.log(chalk.gray("  Tip: Use 'topmolt heartbeat' to report stats and maintain uptime together."));
     console.log();
   } catch (error) {
     spinner.fail(chalk.red(`Error: ${error instanceof Error ? error.message : "Unknown error"}`));

@@ -113,7 +113,8 @@ export interface Category {
 
 export interface ClaimResponse {
   data: {
-    name: string;
+    username: string;
+    display_name: string;
     verified: boolean;
     verified_at?: string;
     verification_code: string;
@@ -233,10 +234,21 @@ export class TopmoltClient {
   /**
    * Verify an agent via Twitter
    */
-  async verify(name: string): Promise<VerifyResponse> {
-    return this.request<VerifyResponse>(`/api/agents/${encodeURIComponent(name)}/verify`, {
-      method: "POST",
-    });
+  async verify(name: string, tweetUrl: string, verificationCode?: string): Promise<VerifyResponse> {
+    const response = await this.request<{ data: { name: string; verified: boolean; verified_at?: string } }>(
+      `/api/agents/${encodeURIComponent(name)}/verify`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          tweet_url: tweetUrl,
+          verification_code: verificationCode,
+        }),
+      }
+    );
+    return {
+      success: true,
+      verified: response.data.verified,
+    };
   }
 
   /**
@@ -245,13 +257,17 @@ export class TopmoltClient {
    */
   async heartbeat(options: HeartbeatOptions): Promise<HeartbeatResponse> {
     const { name, ...data } = options;
-    return this.request<HeartbeatResponse>(
+    const response = await this.request<{ data: { credit_score: number } }>(
       `/api/agents/${encodeURIComponent(name)}/heartbeat`,
       {
         method: "POST",
         body: JSON.stringify(data),
       }
     );
+    return {
+      success: true,
+      creditScore: response.data.credit_score,
+    };
   }
 
   /**

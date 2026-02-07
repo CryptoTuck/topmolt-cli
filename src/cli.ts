@@ -43,6 +43,8 @@ program
   .command("verify")
   .description("Verify agent ownership via Twitter")
   .requiredOption("-u, --username <username>", "Agent @username to verify")
+  .requiredOption("--tweet <url>", "URL of the verification tweet")
+  .option("--code <code>", "Verification code (optional, from registration)")
   .action(verifyCommand);
 
 // Heartbeat command

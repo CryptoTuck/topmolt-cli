@@ -19,7 +19,7 @@ export async function claimCommand(options: ClaimOptions) {
     const { data } = result;
 
     console.log();
-    console.log(chalk.cyan("⚡ Claim Agent: ") + chalk.white(data.name));
+    console.log(chalk.cyan("⚡ Claim Agent: ") + chalk.white(data.display_name));
     console.log();
 
     if (data.verified) {
