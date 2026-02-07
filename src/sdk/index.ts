@@ -170,8 +170,31 @@ export class TopmoltClient {
     });
 
     if (!response.ok) {
-      const errorBody = await response.json().catch(() => ({ message: "" })) as { message?: string };
-      throw new Error(errorBody.message || `HTTP ${response.status}`);
+      // Try to parse error body for details
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const errorBody = await response.json() as { 
+          error?: string; 
+          message?: string; 
+          details?: string;
+        };
+        // Check multiple possible error fields
+        errorMessage = errorBody.error || errorBody.message || errorMessage;
+        if (errorBody.details) {
+          errorMessage += `: ${errorBody.details}`;
+        }
+      } catch {
+        // If JSON parse fails, try to get text
+        try {
+          const textBody = await response.text();
+          if (textBody) {
+            errorMessage = `HTTP ${response.status}: ${textBody.slice(0, 200)}`;
+          }
+        } catch {
+          // Keep default error message
+        }
+      }
+      throw new Error(errorMessage);
     }
 
     return response.json() as Promise<T>;

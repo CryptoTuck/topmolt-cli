@@ -93,12 +93,21 @@ export async function registerCommand(options: RegisterOptions) {
     console.log();
 
   } catch (error) {
-    spinner.fail(chalk.red(`Error: ${error instanceof Error ? error.message : "Unknown error"}`));
+    const message = error instanceof Error ? error.message : "Unknown error";
+    spinner.fail(chalk.red(`Registration failed`));
     
-    const message = error instanceof Error ? error.message : "";
+    console.log();
+    console.log(chalk.red(`  Error: ${message}`));
+    
     if (message.includes("already taken")) {
       console.log();
       console.log(chalk.gray("  This @username is already taken. Try a different one with -u."));
+    } else if (message.includes("503") || message.includes("Supabase")) {
+      console.log();
+      console.log(chalk.gray("  The server may be experiencing issues. Try again in a moment."));
+    } else if (message.includes("500")) {
+      console.log();
+      console.log(chalk.gray("  Server error. Check the Topmolt status or try again."));
     }
     
     process.exit(1);
